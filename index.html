@@ -166,20 +166,20 @@
 
 <script>
 const newsItems = [
-  { title:'Lockheed Martin wins $1.2B USN contract for Aegis BMD system upgrades ahead of RIMPAC 2026 trials', company:'Lockheed Martin', category:'award', date:'Jun 14', amount:'$1.2B', agency:'USN', nation:'US' },
-  { title:'Raytheon demonstrates SM-6 Block IB intercept with Japan Maritime Self-Defense Force at Pearl Harbor', company:'Raytheon', category:'demo', date:'Jun 13', system:'SM-6 Block IB', partner:'JMSDF' },
-  { title:'L3Harris awarded $340M contract to integrate Link 22 tactical data links for RIMPAC coalition comms', company:'L3Harris', category:'award', date:'Jun 12', amount:'$340M', agency:'DoD', nation:'US' },
-  { title:'Boeing receives $285M contract to deploy MQ-25 Stingray tanker drones for carrier wing RIMPAC ops', company:'Boeing', category:'award', date:'Jun 11', amount:'$285M', agency:'USN', nation:'US' },
-  { title:'Kongsberg Defence and Rheinmetall announce joint teaming for NASAMS ground-based air defense at RIMPAC', company:'Kongsberg', category:'partner', date:'Jun 10', partner:'Rheinmetall', system:'NASAMS' },
-  { title:'Navy issues RFP for autonomous undersea vehicle coordination software — $90M, RIMPAC exercise integration', company:'USN', category:'rfp', date:'Jun 9', value:'$90M', program:'AUV-C2' },
-  { title:'General Dynamics Mission Systems wins $195M contract for AN/USC-61 SATCOM terminals on allied warships', company:'GD Mission Systems', category:'award', date:'Jun 8', amount:'$195M', agency:'USN', nation:'US' },
-  { title:'Thales acquires Sparton Marine & Exploration to expand sonobuoy supply for RIMPAC ASW exercises', company:'Thales', category:'acq', date:'Jun 7', target:'Sparton Marine', amount:'$210M' },
-  { title:'Leonardo DRS delivers 14 AN/SQQ-89 sonar suites to Republic of Korea Navy for RIMPAC participation', company:'Leonardo DRS', category:'demo', date:'Jun 6', system:'AN/SQQ-89', partner:'ROKN' },
-  { title:'DARPA issues BAA for Mosaic Warfare AI coordination — $130M, RIMPAC 2026 live-fire evaluation', company:'DARPA', category:'rfp', date:'Jun 5', value:'$130M', program:'Mosaic Warfare AI' },
-  { title:'BAE Systems Australia wins $160M contract to upgrade Anzac-class frigate combat management systems', company:'BAE Systems', category:'award', date:'Jun 4', amount:'$160M', agency:'RAN', nation:'Australia' },
-  { title:'Saab AB and US Navy sign MOU for Carl-Gustaf M4 recoilless rifle logistics integration at RIMPAC', company:'Saab AB', category:'partner', date:'Jun 3', partner:'USN' },
-  { title:'Northrop Grumman awarded $420M to extend E-2D Advanced Hawkeye AEW&C support for RIMPAC carrier ops', company:'Northrop Grumman', category:'award', date:'Jun 2', amount:'$420M', agency:'USN', nation:'US' },
-  { title:'Elbit Systems and Canada DND partner on EW suite integration for HMCS Winnipeg ahead of RIMPAC sailing', company:'Elbit Systems', category:'partner', date:'Jun 1', partner:'Canada DND' },
+  { title:'Lockheed Martin wins $1.2B USN contract for Aegis BMD system upgrades ahead of RIMPAC 2026 trials', company:'Lockheed Martin', category:'award', date:'Jun 14', amount:'$1.2B', agency:'USN', nation:'US', url:'https://news.usni.org/?s=aegis+lockheed' },
+  { title:'Raytheon demonstrates SM-6 Block IB intercept with Japan Maritime Self-Defense Force at Pearl Harbor', company:'Raytheon', category:'demo', date:'Jun 13', system:'SM-6 Block IB', partner:'JMSDF', url:'https://www.defensenews.com/search/#k=SM-6+JMSDF' },
+  { title:'L3Harris awarded $340M contract to integrate Link 22 tactical data links for RIMPAC coalition comms', company:'L3Harris', category:'award', date:'Jun 12', amount:'$340M', agency:'DoD', nation:'US', url:'https://breakingdefense.com/?s=L3Harris+Link+22' },
+  { title:'Boeing receives $285M contract to deploy MQ-25 Stingray tanker drones for carrier wing RIMPAC ops', company:'Boeing', category:'award', date:'Jun 11', amount:'$285M', agency:'USN', nation:'US', url:'https://news.usni.org/?s=MQ-25+stingray' },
+  { title:'Kongsberg Defence and Rheinmetall announce joint teaming for NASAMS ground-based air defense at RIMPAC', company:'Kongsberg', category:'partner', date:'Jun 10', partner:'Rheinmetall', system:'NASAMS', url:'https://breakingdefense.com/?s=kongsberg+NASAMS' },
+  { title:'Navy issues RFP for autonomous undersea vehicle coordination software — $90M, RIMPAC exercise integration', company:'USN', category:'rfp', date:'Jun 9', value:'$90M', program:'AUV-C2', url:'https://sam.gov/search/?keywords=autonomous+undersea+vehicle+coordination' },
+  { title:'General Dynamics Mission Systems wins $195M contract for AN/USC-61 SATCOM terminals on allied warships', company:'GD Mission Systems', category:'award', date:'Jun 8', amount:'$195M', agency:'USN', nation:'US', url:'https://news.usni.org/?s=general+dynamics+SATCOM' },
+  { title:'Thales acquires Sparton Marine & Exploration to expand sonobuoy supply for RIMPAC ASW exercises', company:'Thales', category:'acq', date:'Jun 7', target:'Sparton Marine', amount:'$210M', url:'https://www.defensenews.com/search/#k=Thales+Sparton' },
+  { title:'Leonardo DRS delivers 14 AN/SQQ-89 sonar suites to Republic of Korea Navy for RIMPAC participation', company:'Leonardo DRS', category:'demo', date:'Jun 6', system:'AN/SQQ-89', partner:'ROKN', url:'https://breakingdefense.com/?s=Leonardo+DRS+sonar+Korea' },
+  { title:'DARPA issues BAA for Mosaic Warfare AI coordination — $130M, RIMPAC 2026 live-fire evaluation', company:'DARPA', category:'rfp', date:'Jun 5', value:'$130M', program:'Mosaic Warfare AI', url:'https://www.darpa.mil/news-events/announcements' },
+  { title:'BAE Systems Australia wins $160M contract to upgrade Anzac-class frigate combat management systems', company:'BAE Systems', category:'award', date:'Jun 4', amount:'$160M', agency:'RAN', nation:'Australia', url:'https://www.defensenews.com/search/#k=BAE+Anzac+frigate' },
+  { title:'Saab AB and US Navy sign MOU for Carl-Gustaf M4 recoilless rifle logistics integration at RIMPAC', company:'Saab AB', category:'partner', date:'Jun 3', partner:'USN', url:'https://breakingdefense.com/?s=Saab+Carl-Gustaf+Navy' },
+  { title:'Northrop Grumman awarded $420M to extend E-2D Advanced Hawkeye AEW&C support for RIMPAC carrier ops', company:'Northrop Grumman', category:'award', date:'Jun 2', amount:'$420M', agency:'USN', nation:'US', url:'https://news.usni.org/?s=E-2D+Hawkeye+northrop' },
+  { title:'Elbit Systems and Canada DND partner on EW suite integration for HMCS Winnipeg ahead of RIMPAC sailing', company:'Elbit Systems', category:'partner', date:'Jun 1', partner:'Canada DND', url:'https://breakingdefense.com/?s=Elbit+Canada+EW' },
 ];
 
 const contracts = [
@@ -242,8 +242,7 @@ function metaLine(item) {
 }
 
 function newsUrl(item) {
-  const q = encodeURIComponent(item.company + ' ' + item.title.slice(0, 60));
-  return 'https://news.google.com/search?q=' + q;
+  return item.url;
 }
 function samUrl(c) {
   const q = encodeURIComponent(c.contractor + ' ' + c.program);
