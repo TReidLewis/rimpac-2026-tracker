@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RIMPAC 2026 Tracker</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg-primary: #ffffff; --bg-secondary: #f5f5f4; --bg-tertiary: #eeece7;
+      --text-primary: #1a1a18; --text-secondary: #6b6b67; --text-tertiary: #9b9b96;
+      --border-light: rgba(0,0,0,0.1); --border-mid: rgba(0,0,0,0.18); --border-strong: rgba(0,0,0,0.28);
+      --radius-md: 8px; --radius-lg: 12px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg-primary: #1c1c1a; --bg-secondary: #272724; --bg-tertiary: #323230;
+        --text-primary: #f0ede8; --text-secondary: #a8a8a3; --text-tertiary: #6b6b67;
+        --border-light: rgba(255,255,255,0.08); --border-mid: rgba(255,255,255,0.14); --border-strong: rgba(255,255,255,0.22);
+      }
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg-tertiary); color: var(--text-primary); min-height: 100vh; }
+    .app-shell { max-width: 820px; margin: 0 auto; padding: 0 1rem 3rem; }
+    header { padding: 1.5rem 0 0; margin-bottom: 1.5rem; }
+    header h1 { font-size: 18px; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+    header p { font-size: 13px; color: var(--text-secondary); margin-top: 4px; }
+    .nav { display: flex; gap: 4px; padding: 0 0 1.25rem; border-bottom: 0.5px solid var(--border-light); margin-bottom: 1.25rem; flex-wrap: wrap; }
+    .nav-btn { background: none; border: 0.5px solid transparent; border-radius: var(--radius-md); padding: 6px 14px; font-size: 13px; font-weight: 500; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.15s; }
+    .nav-btn:hover { background: var(--bg-secondary); color: var(--text-primary); }
+    .nav-btn.active { background: var(--bg-secondary); border-color: var(--border-mid); color: var(--text-primary); }
+    .view { display: none; } .view.active { display: block; }
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.25rem; }
+    @media (max-width: 600px) { .metrics { grid-template-columns: repeat(2, 1fr); } }
+    .metric { background: var(--bg-secondary); border-radius: var(--radius-md); padding: 14px 16px; }
+    .metric-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; }
+    .metric-value { font-size: 22px; font-weight: 500; }
+    .metric-sub { font-size: 11px; color: var(--text-tertiary); margin-top: 3px; }
+    .section-title { font-size: 13px; font-weight: 500; color: var(--text-secondary); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .feed { display: flex; flex-direction: column; gap: 8px; }
+    .card { background: var(--bg-primary); border: 0.5px solid var(--border-light); border-radius: var(--radius-lg); padding: 14px 16px; transition: border-color 0.15s; }
+    .card:hover { border-color: var(--border-mid); }
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .card-title { font-size: 14px; font-weight: 500; line-height: 1.4; }
+    .card-meta { font-size: 12px; color: var(--text-secondary); margin-top: 6px; }
+    .badge { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: var(--radius-md); white-space: nowrap; }
+    .badge-award { background: #EAF3DE; color: #3B6D11; }
+    .badge-rfp { background: #E6F1FB; color: #185FA5; }
+    .badge-demo { background: #E6F1FB; color: #185FA5; }
+    .badge-contract { background: #FAEEDA; color: #854F0B; }
+    .badge-acq { background: #FBEAF0; color: #993556; }
+    .badge-partner { background: #EAF3DE; color: #3B6D11; }
+    .filters { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+    .filter-btn { background: none; border: 0.5px solid var(--border-light); border-radius: 99px; padding: 5px 14px; font-size: 12px; color: var(--text-secondary); cursor: pointer; display: flex; align-items: center; gap: 5px; }
+    .filter-btn:hover { border-color: var(--border-mid); color: var(--text-primary); }
+    .filter-btn.active { background: var(--bg-secondary); border-color: var(--border-strong); color: var(--text-primary); }
+    .trending-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 1.5rem; }
+    .trend-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--bg-primary); border: 0.5px solid var(--border-light); border-radius: var(--radius-md); }
+    .trend-num { font-size: 12px; color: var(--text-tertiary); min-width: 16px; }
+    .trend-name { font-size: 13px; font-weight: 500; flex: 1; }
+    .trend-tag { font-size: 11px; color: var(--text-secondary); }
+    .watchlist-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    @media (max-width: 500px) { .watchlist-grid { grid-template-columns: 1fr; } }
+    .wcard { background: var(--bg-primary); border: 0.5px solid var(--border-light); border-radius: var(--radius-lg); padding: 14px 16px; }
+    .wcard-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .wcard-name { font-size: 14px; font-weight: 500; }
+    .wcard-sector { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+    .wcard-stats { display: flex; gap: 14px; border-top: 0.5px solid var(--border-light); padding-top: 10px; }
+    .wstat { font-size: 11px; color: var(--text-secondary); }
+    .wstat strong { display: block; font-size: 13px; font-weight: 500; color: var(--text-primary); }
+    .remove-btn { background: none; border: none; color: var(--text-tertiary); cursor: pointer; font-size: 16px; padding: 0; }
+    .remove-btn:hover { color: var(--text-secondary); }
+    .add-row { display: flex; gap: 8px; margin-bottom: 14px; }
+    .add-row input { flex: 1; font-size: 13px; padding: 7px 12px; border: 0.5px solid var(--border-mid); border-radius: var(--radius-md); background: var(--bg-primary); color: var(--text-primary); outline: none; }
+    .add-row input:focus { border-color: var(--border-strong); }
+    .add-row button { font-size: 13px; padding: 7px 14px; border: 0.5px solid var(--border-mid); border-radius: var(--radius-md); background: var(--bg-secondary); color: var(--text-primary); cursor: pointer; display: flex; align-items: center; gap: 5px; }
+    .add-row button:hover { background: var(--bg-tertiary); }
+    .con-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.25rem; }
+    .con-filters { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+    .con-filters input { flex: 1; min-width: 160px; font-size: 13px; padding: 6px 12px; border: 0.5px solid var(--border-mid); border-radius: var(--radius-md); background: var(--bg-primary); color: var(--text-primary); outline: none; }
+    .con-filters select { font-size: 13px; padding: 6px 10px; border: 0.5px solid var(--border-mid); border-radius: var(--radius-md); background: var(--bg-primary); color: var(--text-primary); outline: none; cursor: pointer; }
+    .nation-flag { font-size: 13px; }
+    .empty { text-align: center; padding: 2rem; color: var(--text-tertiary); font-size: 13px; }
+  </style>
+</head>
+<body>
+<div class="app-shell">
+  <header>
+    <h1><i class="ti ti-ship" aria-hidden="true"></i> RIMPAC 2026 tracker</h1>
+    <p>Contracts, awards, tech demos, and company activity for the Rim of the Pacific exercise — Pearl Harbor, Hawaii</p>
+  </header>
+
+  <nav class="nav" role="tablist">
+    <button class="nav-btn active" onclick="showView('dashboard',this)"><i class="ti ti-layout-dashboard" aria-hidden="true"></i> Dashboard</button>
+    <button class="nav-btn" onclick="showView('newsfeed',this)"><i class="ti ti-news" aria-hidden="true"></i> News feed</button>
+    <button class="nav-btn" onclick="showView('contracts',this)"><i class="ti ti-file-invoice" aria-hidden="true"></i> Contracts</button>
+    <button class="nav-btn" onclick="showView('watchlist',this)"><i class="ti ti-star" aria-hidden="true"></i> Watchlist</button>
+  </nav>
+
+  <div id="view-dashboard" class="view active">
+    <div class="metrics">
+      <div class="metric"><div class="metric-label">Participating nations</div><div class="metric-value">29</div><div class="metric-sub">Indo-Pacific &amp; allies</div></div>
+      <div class="metric"><div class="metric-label">Active contracts</div><div class="metric-value">42</div><div class="metric-sub">$8.3B ceiling</div></div>
+      <div class="metric"><div class="metric-label">Tech demos</div><div class="metric-value">17</div><div class="metric-sub">scheduled Jun–Aug 2026</div></div>
+      <div class="metric"><div class="metric-label">Companies tracked</div><div class="metric-value" id="dash-count">6</div><div class="metric-sub">on your watchlist</div></div>
+    </div>
+    <div class="section-title">Trending companies</div>
+    <div class="trending-list" id="trending-list"></div>
+    <div class="section-title">Recent activity</div>
+    <div class="feed" id="dash-feed"></div>
+  </div>
+
+  <div id="view-newsfeed" class="view">
+    <div class="filters" role="group" aria-label="Category filters">
+      <button class="filter-btn active" onclick="filterFeed('all',this)">All</button>
+      <button class="filter-btn" onclick="filterFeed('award',this)"><i class="ti ti-trophy" aria-hidden="true"></i> Awards</button>
+      <button class="filter-btn" onclick="filterFeed('rfp',this)"><i class="ti ti-file-description" aria-hidden="true"></i> RFPs</button>
+      <button class="filter-btn" onclick="filterFeed('demo',this)"><i class="ti ti-radar" aria-hidden="true"></i> Tech demos</button>
+      <button class="filter-btn" onclick="filterFeed('partner',this)"><i class="ti ti-handshake" aria-hidden="true"></i> Partnerships</button>
+      <button class="filter-btn" onclick="filterFeed('acq',this)"><i class="ti ti-building-skyscraper" aria-hidden="true"></i> M&amp;A</button>
+    </div>
+    <div class="feed" id="news-feed"></div>
+  </div>
+
+  <div id="view-contracts" class="view">
+    <div class="con-metrics">
+      <div class="metric"><div class="metric-label">Contracts shown</div><div class="metric-value" id="con-total">20</div><div class="metric-sub" id="con-sub">across 7 contractors</div></div>
+      <div class="metric"><div class="metric-label">Largest award</div><div class="metric-value" style="font-size:15px;padding-top:4px;">$1.2B</div><div class="metric-sub">Lockheed / USN</div></div>
+      <div class="metric"><div class="metric-label">Most active domain</div><div class="metric-value" style="font-size:15px;padding-top:4px;">C4ISR</div><div class="metric-sub">8 of 20 contracts</div></div>
+    </div>
+    <div class="con-filters">
+      <input type="text" id="con-search" placeholder="Search contractor, program, nation…" oninput="renderContracts()" aria-label="Search contracts" />
+      <select id="nation-filter" onchange="renderContracts()" aria-label="Filter by nation">
+        <option value="all">All nations</option>
+        <option value="US">United States</option>
+        <option value="Australia">Australia</option>
+        <option value="Japan">Japan</option>
+        <option value="South Korea">South Korea</option>
+        <option value="Canada">Canada</option>
+        <option value="UK">United Kingdom</option>
+        <option value="France">France</option>
+      </select>
+      <select id="domain-filter" onchange="renderContracts()" aria-label="Filter by capability">
+        <option value="all">All domains</option>
+        <option value="C4ISR">C4ISR</option>
+        <option value="Undersea warfare">Undersea warfare</option>
+        <option value="Surface warfare">Surface warfare</option>
+        <option value="Aviation">Aviation</option>
+        <option value="Logistics">Logistics</option>
+        <option value="Cyber">Cyber</option>
+      </select>
+    </div>
+    <div class="feed" id="contracts-feed"></div>
+  </div>
+
+  <div id="view-watchlist" class="view">
+    <div class="add-row">
+      <input type="text" id="company-input" placeholder="Add a company (e.g. Kongsberg Defence)" aria-label="Company name" />
+      <button onclick="addCompany()"><i class="ti ti-plus" aria-hidden="true"></i> Add</button>
+    </div>
+    <div class="watchlist-grid" id="watchlist-grid"></div>
+  </div>
+</div>
+
+<script>
+const newsItems = [
+  { title:'Lockheed Martin wins $1.2B USN contract for Aegis BMD system upgrades ahead of RIMPAC 2026 trials', company:'Lockheed Martin', category:'award', date:'Jun 14', amount:'$1.2B', agency:'USN', nation:'US' },
+  { title:'Raytheon demonstrates SM-6 Block IB intercept with Japan Maritime Self-Defense Force at Pearl Harbor', company:'Raytheon', category:'demo', date:'Jun 13', system:'SM-6 Block IB', partner:'JMSDF' },
+  { title:'L3Harris awarded $340M contract to integrate Link 22 tactical data links for RIMPAC coalition comms', company:'L3Harris', category:'award', date:'Jun 12', amount:'$340M', agency:'DoD', nation:'US' },
+  { title:'Boeing receives $285M contract to deploy MQ-25 Stingray tanker drones for carrier wing RIMPAC ops', company:'Boeing', category:'award', date:'Jun 11', amount:'$285M', agency:'USN', nation:'US' },
+  { title:'Kongsberg Defence and Rheinmetall announce joint teaming for NASAMS ground-based air defense at RIMPAC', company:'Kongsberg', category:'partner', date:'Jun 10', partner:'Rheinmetall', system:'NASAMS' },
+  { title:'Navy issues RFP for autonomous undersea vehicle coordination software — $90M, RIMPAC exercise integration', company:'USN', category:'rfp', date:'Jun 9', value:'$90M', program:'AUV-C2' },
+  { title:'General Dynamics Mission Systems wins $195M contract for AN/USC-61 SATCOM terminals on allied warships', company:'GD Mission Systems', category:'award', date:'Jun 8', amount:'$195M', agency:'USN', nation:'US' },
+  { title:'Thales acquires Sparton Marine & Exploration to expand sonobuoy supply for RIMPAC ASW exercises', company:'Thales', category:'acq', date:'Jun 7', target:'Sparton Marine', amount:'$210M' },
+  { title:'Leonardo DRS delivers 14 AN/SQQ-89 sonar suites to Republic of Korea Navy for RIMPAC participation', company:'Leonardo DRS', category:'demo', date:'Jun 6', system:'AN/SQQ-89', partner:'ROKN' },
+  { title:'DARPA issues BAA for Mosaic Warfare AI coordination — $130M, RIMPAC 2026 live-fire evaluation', company:'DARPA', category:'rfp', date:'Jun 5', value:'$130M', program:'Mosaic Warfare AI' },
+  { title:'BAE Systems Australia wins $160M contract to upgrade Anzac-class frigate combat management systems', company:'BAE Systems', category:'award', date:'Jun 4', amount:'$160M', agency:'RAN', nation:'Australia' },
+  { title:'Saab AB and US Navy sign MOU for Carl-Gustaf M4 recoilless rifle logistics integration at RIMPAC', company:'Saab AB', category:'partner', date:'Jun 3', partner:'USN' },
+  { title:'Northrop Grumman awarded $420M to extend E-2D Advanced Hawkeye AEW&C support for RIMPAC carrier ops', company:'Northrop Grumman', category:'award', date:'Jun 2', amount:'$420M', agency:'USN', nation:'US' },
+  { title:'Elbit Systems and Canada DND partner on EW suite integration for HMCS Winnipeg ahead of RIMPAC sailing', company:'Elbit Systems', category:'partner', date:'Jun 1', partner:'Canada DND' },
+];
+
+const contracts = [
+  { contractor:'Lockheed Martin', program:'Aegis BMD System Upgrades', nation:'US', domain:'Surface warfare', value:'$1.2B', type:'Cost-Plus', awarded:'Jun 14', pop:'5 years' },
+  { contractor:'L3Harris Technologies', program:'Link 22 Tactical Data Link Integration', nation:'US', domain:'C4ISR', value:'$340M', type:'Fixed-Price', awarded:'Jun 12', pop:'4 years' },
+  { contractor:'Boeing', program:'MQ-25 Stingray Carrier Drone Ops', nation:'US', domain:'Aviation', value:'$285M', type:'Cost-Plus', awarded:'Jun 11', pop:'3 years' },
+  { contractor:'General Dynamics Mission Systems', program:'AN/USC-61 SATCOM Terminals', nation:'US', domain:'C4ISR', value:'$195M', type:'Fixed-Price', awarded:'Jun 8', pop:'4 years' },
+  { contractor:'BAE Systems Australia', program:'Anzac-Class CMS Upgrade', nation:'Australia', domain:'Surface warfare', value:'$160M', type:'Fixed-Price', awarded:'Jun 4', pop:'3 years' },
+  { contractor:'Northrop Grumman', program:'E-2D Advanced Hawkeye AEW&C Support', nation:'US', domain:'Aviation', value:'$420M', type:'Cost-Plus', awarded:'Jun 2', pop:'5 years' },
+  { contractor:'Raytheon', program:'SM-6 Block IB Missiles — Allied FMS', nation:'Japan', domain:'Surface warfare', value:'$310M', type:'Fixed-Price', awarded:'May 30', pop:'4 years' },
+  { contractor:'Leonardo DRS', program:'AN/SQQ-89 Sonar Suite Delivery', nation:'South Korea', domain:'Undersea warfare', value:'$88M', type:'Fixed-Price', awarded:'May 28', pop:'2 years' },
+  { contractor:'Leidos', program:'Maritime Cyber Defense Operations', nation:'US', domain:'Cyber', value:'$115M', type:'Cost-Plus', awarded:'May 25', pop:'3 years' },
+  { contractor:'Kongsberg Defence', program:'NASAMS Launcher Integration', nation:'US', domain:'Surface warfare', value:'$74M', type:'Fixed-Price', awarded:'May 22', pop:'2 years' },
+  { contractor:'Thales Group', program:'Combat System Integration — FNS Normandie', nation:'France', domain:'C4ISR', value:'$95M', type:'Cost-Plus', awarded:'May 19', pop:'3 years' },
+  { contractor:'General Atomics', program:'MQ-9B SeaGuardian Maritime Patrol', nation:'US', domain:'Aviation', value:'$230M', type:'IDIQ', awarded:'May 16', pop:'5 years' },
+  { contractor:'Saab AB', program:'Carl-Gustaf M4 Logistics & Sustainment', nation:'US', domain:'Logistics', value:'$42M', type:'Fixed-Price', awarded:'May 13', pop:'3 years' },
+  { contractor:'L3Harris', program:'AN/BLQ-10 Electronic Warfare Suite', nation:'US', domain:'Undersea warfare', value:'$128M', type:'Cost-Plus', awarded:'May 10', pop:'4 years' },
+  { contractor:'CAE', program:'Multi-Mission Maritime Aircraft Simulator', nation:'Canada', domain:'Aviation', value:'$67M', type:'Fixed-Price', awarded:'May 7', pop:'5 years' },
+  { contractor:'Palantir', program:'JADC2 AI Data Fusion — RIMPAC C2 Node', nation:'US', domain:'C4ISR', value:'$85M', type:'OTA', awarded:'May 4', pop:'2 years' },
+  { contractor:'Elbit Systems', program:'EW Suite — HMCS Winnipeg Refit', nation:'Canada', domain:'C4ISR', value:'$55M', type:'Fixed-Price', awarded:'May 1', pop:'2 years' },
+  { contractor:'Babcock International', program:'RFA Logistics Ship Maintenance', nation:'UK', domain:'Logistics', value:'$38M', type:'Fixed-Price', awarded:'Apr 28', pop:'2 years' },
+  { contractor:'Hanwha Defense', program:'K-SAAM Short-Range Air Defense', nation:'South Korea', domain:'Surface warfare', value:'$92M', type:'Fixed-Price', awarded:'Apr 25', pop:'3 years' },
+  { contractor:'Raytheon', program:'Phalanx CIWS Block 1B Upgrades — 5 Ships', nation:'Australia', domain:'Surface warfare', value:'$61M', type:'Fixed-Price', awarded:'Apr 22', pop:'2 years' },
+];
+
+const trending = [
+  { name:'Lockheed Martin', tag:'$1.2B Aegis contract', badge:'award' },
+  { name:'Northrop Grumman', tag:'$420M E-2D Hawkeye', badge:'award' },
+  { name:'Raytheon', tag:'SM-6 JMSDF demo', badge:'demo' },
+  { name:'L3Harris', tag:'Link 22 integration', badge:'award' },
+  { name:'Thales', tag:'Sparton acquisition', badge:'acq' },
+];
+
+let watchlist = [
+  { name:'Lockheed Martin', focus:'Aegis / F-35 / undersea', contracts:'$4.8B RIMPAC-linked', nations:'US · Japan · Australia', demos:'3 scheduled' },
+  { name:'Raytheon Technologies', focus:'Missiles / radar / EW', contracts:'$2.1B RIMPAC-linked', nations:'US · Japan · Australia · UK', demos:'4 scheduled' },
+  { name:'L3Harris', focus:'C4ISR / EW / comms', contracts:'$680M RIMPAC-linked', nations:'US · Canada · UK', demos:'2 scheduled' },
+  { name:'Boeing Defense', focus:'Maritime aviation / UAS', contracts:'$1.1B RIMPAC-linked', nations:'US · Australia', demos:'2 scheduled' },
+  { name:'Kongsberg Defence', focus:'NASAMS / NSM / RWS', contracts:'$220M RIMPAC-linked', nations:'US · Norway · Australia', demos:'1 scheduled' },
+  { name:'Thales Group', focus:'Naval C2 / sonar / EW', contracts:'$310M RIMPAC-linked', nations:'France · Australia · Canada', demos:'2 scheduled' },
+];
+
+function badgeClass(cat) {
+  return { award:'badge-award', rfp:'badge-rfp', demo:'badge-demo', partner:'badge-partner', acq:'badge-acq', contract:'badge-contract' }[cat] || '';
+}
+function badgeLabel(cat) {
+  return { award:'Award', rfp:'RFP', demo:'Tech demo', partner:'Partnership', acq:'M&A', contract:'Contract' }[cat] || cat;
+}
+function metaLine(item) {
+  const parts = [item.company, item.date];
+  if (item.amount) parts.push(item.amount);
+  if (item.agency) parts.push(item.agency);
+  if (item.nation) parts.push(item.nation);
+  if (item.value) parts.push(item.value + ' ceiling');
+  if (item.program) parts.push(item.program);
+  if (item.system) parts.push(item.system);
+  if (item.partner) parts.push('× ' + item.partner);
+  if (item.target) parts.push(item.target);
+  return parts.join(' · ');
+}
+
+function renderCard(item) {
+  return `<div class="card"><div class="card-top"><div class="card-title">${item.title}</div><span class="badge ${badgeClass(item.category)}">${badgeLabel(item.category)}</span></div><div class="card-meta">${metaLine(item)}</div></div>`;
+}
+
+function renderFeed(id, filter) {
+  const el = document.getElementById(id);
+  const filtered = filter === 'all' ? newsItems : newsItems.filter(i => i.category === filter);
+  el.innerHTML = filtered.length ? filtered.map(renderCard).join('') : '<div class="empty">No items match this filter.</div>';
+}
+
+const nationFlag = { US:'🇺🇸', Australia:'🇦🇺', Japan:'🇯🇵', 'South Korea':'🇰🇷', Canada:'🇨🇦', UK:'🇬🇧', France:'🇫🇷', Norway:'🇳🇴' };
+
+function renderContracts() {
+  const search = document.getElementById('con-search').value.toLowerCase();
+  const nation = document.getElementById('nation-filter').value;
+  const domain = document.getElementById('domain-filter').value;
+  const filtered = contracts.filter(c => {
+    const ms = !search || c.contractor.toLowerCase().includes(search) || c.program.toLowerCase().includes(search) || c.nation.toLowerCase().includes(search);
+    return ms && (nation === 'all' || c.nation === nation) && (domain === 'all' || c.domain === domain);
+  });
+  document.getElementById('con-total').textContent = filtered.length;
+  const contractors = new Set(filtered.map(c => c.contractor));
+  document.getElementById('con-sub').textContent = 'across ' + contractors.size + ' contractor' + (contractors.size === 1 ? '' : 's');
+  const el = document.getElementById('contracts-feed');
+  el.innerHTML = filtered.length ? filtered.map(c => `<div class="card">
+    <div class="card-top"><div class="card-title">${c.program}</div><span class="badge badge-contract">${c.domain}</span></div>
+    <div class="card-meta" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:6px;">
+      <span><i class="ti ti-building" style="font-size:12px;vertical-align:-1px;margin-right:3px" aria-hidden="true"></i>${c.contractor}</span>
+      <span>${nationFlag[c.nation] || ''} ${c.nation}</span>
+      <span style="font-weight:500;color:var(--text-primary)">${c.value}</span>
+      <span><i class="ti ti-tag" style="font-size:12px;vertical-align:-1px;margin-right:2px" aria-hidden="true"></i>${c.type}</span>
+      <span style="margin-left:auto"><i class="ti ti-calendar" style="font-size:12px;vertical-align:-1px;margin-right:3px" aria-hidden="true"></i>${c.awarded} · ${c.pop}</span>
+    </div>
+  </div>`).join('') : '<div class="empty">No contracts match.</div>';
+}
+
+function renderDashFeed() {
+  renderFeed('dash-feed', 'all');
+  document.getElementById('trending-list').innerHTML = trending.map((t, i) => `<div class="trend-item">
+    <span class="trend-num">${i + 1}</span>
+    <span class="trend-name">${t.name}</span>
+    <span class="badge ${badgeClass(t.badge)}" style="margin-left:auto">${badgeLabel(t.badge)}</span>
+    <span class="trend-tag">${t.tag}</span>
+  </div>`).join('');
+}
+
+function renderWatchlist() {
+  const grid = document.getElementById('watchlist-grid');
+  if (!watchlist.length) { grid.innerHTML = '<div class="empty" style="grid-column:1/-1">No companies yet.</div>'; return; }
+  grid.innerHTML = watchlist.map((c, i) => `<div class="wcard">
+    <div class="wcard-header">
+      <div><div class="wcard-name">${c.name}</div><div class="wcard-sector">${c.focus}</div></div>
+      <button class="remove-btn" onclick="removeCompany(${i})" aria-label="Remove ${c.name}"><i class="ti ti-x" aria-hidden="true"></i></button>
+    </div>
+    <div class="wcard-stats">
+      <div class="wstat"><strong>${c.contracts}</strong>Contracts</div>
+      <div class="wstat"><strong>${c.demos}</strong>Demos</div>
+    </div>
+    <div style="font-size:11px;color:var(--text-tertiary);margin-top:8px;border-top:0.5px solid var(--border-light);padding-top:8px;"><i class="ti ti-flag" style="font-size:11px;vertical-align:-1px;margin-right:4px" aria-hidden="true"></i>${c.nations}</div>
+  </div>`).join('');
+  document.getElementById('dash-count').textContent = watchlist.length;
+}
+
+function filterFeed(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderFeed('news-feed', cat);
+}
+
+function showView(name, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+function addCompany() {
+  const input = document.getElementById('company-input');
+  const name = input.value.trim();
+  if (!name || watchlist.find(c => c.name.toLowerCase() === name.toLowerCase())) { input.value = ''; return; }
+  watchlist.push({ name, focus: 'Defense contractor', contracts: '—', nations: '—', demos: '—' });
+  input.value = '';
+  renderWatchlist();
+}
+
+function removeCompany(i) { watchlist.splice(i, 1); renderWatchlist(); }
+
+document.getElementById('company-input').addEventListener('keydown', e => { if (e.key === 'Enter') addCompany(); });
+renderDashFeed(); renderFeed('news-feed', 'all'); renderContracts(); renderWatchlist();
+</script>
+</body>
+</html>
