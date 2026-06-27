@@ -81,6 +81,8 @@
     .con-filters select { font-size: 13px; padding: 6px 10px; border: 0.5px solid var(--border-mid); border-radius: var(--radius-md); background: var(--bg-primary); color: var(--text-primary); outline: none; cursor: pointer; }
     .nation-flag { font-size: 13px; }
     .empty { text-align: center; padding: 2rem; color: var(--text-tertiary); font-size: 13px; }
+    .card-title-link { text-decoration: none; color: inherit; flex: 1; }
+    .card-title-link:hover .card-title { color: var(--text-secondary); }
   </style>
 </head>
 <body>
@@ -239,8 +241,17 @@ function metaLine(item) {
   return parts.join(' · ');
 }
 
+function newsUrl(item) {
+  const q = encodeURIComponent(item.company + ' ' + item.title.slice(0, 60));
+  return 'https://news.google.com/search?q=' + q;
+}
+function samUrl(c) {
+  const q = encodeURIComponent(c.contractor + ' ' + c.program);
+  return 'https://sam.gov/search/?keywords=' + q;
+}
 function renderCard(item) {
-  return `<div class="card"><div class="card-top"><div class="card-title">${item.title}</div><span class="badge ${badgeClass(item.category)}">${badgeLabel(item.category)}</span></div><div class="card-meta">${metaLine(item)}</div></div>`;
+  const url = newsUrl(item);
+  return `<div class="card"><div class="card-top"><a href="${url}" target="_blank" rel="noopener" class="card-title-link"><div class="card-title">${item.title} <i class="ti ti-external-link" style="font-size:12px;vertical-align:1px;opacity:0.45;margin-left:3px" aria-hidden="true"></i></div></a><span class="badge ${badgeClass(item.category)}">${badgeLabel(item.category)}</span></div><div class="card-meta">${metaLine(item)}</div></div>`;
 }
 
 function renderFeed(id, filter) {
@@ -264,7 +275,7 @@ function renderContracts() {
   document.getElementById('con-sub').textContent = 'across ' + contractors.size + ' contractor' + (contractors.size === 1 ? '' : 's');
   const el = document.getElementById('contracts-feed');
   el.innerHTML = filtered.length ? filtered.map(c => `<div class="card">
-    <div class="card-top"><div class="card-title">${c.program}</div><span class="badge badge-contract">${c.domain}</span></div>
+    <div class="card-top"><a href="${samUrl(c)}" target="_blank" rel="noopener" class="card-title-link"><div class="card-title">${c.program} <i class="ti ti-external-link" style="font-size:12px;vertical-align:1px;opacity:0.45;margin-left:3px" aria-hidden="true"></i></div></a><span class="badge badge-contract">${c.domain}</span></div>
     <div class="card-meta" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:6px;">
       <span><i class="ti ti-building" style="font-size:12px;vertical-align:-1px;margin-right:3px" aria-hidden="true"></i>${c.contractor}</span>
       <span>${nationFlag[c.nation] || ''} ${c.nation}</span>
